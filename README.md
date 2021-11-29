@@ -19,7 +19,8 @@ The provided Docker Compose configuration simplifies the implemention of the dev
 - PostgreSQL 13.1
 - Caddy 2.3.0
 
-Caddy provides automatic HTTPS, and will expose the app at port 443 via the domain specified in an `APP_URL` environment variable. Be sure to add this domain to your `etc/hosts` file.
+Caddy provides automatic HTTPS, and will expose the app at port 443 via the domain specified in an `APP_URL` environment variable. Be sure to add this domain (the one you set at `APP_URL`) to your `etc/hosts` file.
+By default, `APP_URL` is set to `localhost` and, the final url will be `https://localhost`. You don't need to do any extra setup in that case.
 
 ## Features
 - Docker implementation includes PHP FPM, PostgreSQL, and Caddy server.
