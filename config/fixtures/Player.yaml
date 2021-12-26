@@ -1,0 +1,7 @@
+App\Entity\Player:
+  player_{1..30}:
+    team_id: <numberBetween(1, 5)>
+    name: <word()>
+    birth_date: '<numberBetween(1, 2003)>-<numberBetween(1, 12)>-<numberBetween(1, 28)>'
+    position: 'Delantero'
+    salary: <numberBetween(1, 31590909)>
