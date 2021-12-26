@@ -41,7 +41,17 @@ By default, `APP_URL` is set to `localhost` and, the final url will be `https://
 
 1. Rename `.env.dist` to `.env`. 
 2. Run `docker compose up`.
-3. Optionally install fixtures by running `docker exec -t app_php_1 /bin/sh -c "php bin/console hautelook:fixtures:load"`
+3. Execute migrations.
+
+  ```bash
+  docker exec -t app_php_1 /bin/sh -c "php bin/console doctrine:migrations:migrate"
+  ```
+
+4. Optionally install fixtures.
+
+  ```bash
+  docker exec -t app_php_1 /bin/sh -c "php bin/console hautelook:fixtures:load"
+  ```
 
 **A note on POST, PUT, and DELETE Requests**:  
 In order to run any `POST`, `PUT`, or `DELETE` requests, you'll need to send a valid API key in the `X_AUTH_TOKEN` header. To aquire an API key, you'll need to create an inital user by installing the fixtures. Passwords, and API keys, are scrubbed from the JSON during serialization, so in order to actually retrieve the api key, you'll need to load up the database in an app like TablePlus.

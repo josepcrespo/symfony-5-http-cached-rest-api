@@ -1,0 +1,33 @@
+doctrine_migrations:
+  # List of namespace/path pairs to search for migrations, at least one required
+  migrations_paths:
+    "App\\DoctrineMigrations": "src/Migrations"
+
+  # Connection to use for the migrations
+  # connection: default
+
+  # Entity manager to use for migrations. This overrides the "connection" setting.
+  em: default
+
+  # Default (SQL table) metadata storage configuration
+  storage:
+    table_storage:
+      table_name: "doctrine_migration_versions"
+      version_column_name: "version"
+      version_column_length: 192
+      executed_at_column_name: "executed_at"
+
+  # Possible values: "year", "year_and_month", none
+  organize_migrations: "BY_YEAR_AND_MONTH"
+
+  # Path to your custom migrations template
+  custom_template: ~
+
+  # Run all migrations in a transaction.
+  all_or_nothing: false
+
+  # Adds an extra check in the generated migrations to ensure that is executed on the same database type.
+  check_database_platform: true
+
+  # Whether or not to wrap migrations in a single transaction.
+  transactional: true
