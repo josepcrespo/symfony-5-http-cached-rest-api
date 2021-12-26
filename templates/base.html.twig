@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Symfony 5 HTTP Rest API</title>
+    <title>LaLiga Symfony 5 HTTP Rest API</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -30,18 +30,13 @@
   </head>
   <body>
     {% block body %}
-      <h1>Symfony 5 HTTP Rest API</h1>
-      <p>Open up your browsers developer console and visit an api route. The response will return a 304 response code, indicating a cached response. If you recieve a 200 response, simply refresh the page and check again. Also take note of the 'age' header. It represents the elapsed time since the response was originally cached.</p>
-      <p>There are 6 entities provided by the app. The GET all endpoint for each entity is provided below.</p>
+      <h1>LaLiga Symfony 5 HTTP Rest API</h1>
+      <p>Entidades de la aplicación. Se puede consumir cada recurso usando los verbos HTTP GET/POST/PUT/DELETE siguiendo el estándar REST.</p>
       <ul>
-        <li><a href='/api/user'>Users Resource</a></li>
-        <li><a href='/api/category'>Category Resource</a></li>
-        <li><a href='/api/tag'>Tag Resource</a></li>
-        <li><a href='/api/article'>Article Resource</a></li>
-        <li><a href='/api/project-category'>Project Category Resource</a></li>
-        <li><a href='/api/project'>Project Resource</a></li>
+        <li><a href='/api/user'>Usuarios</a></li>
+        <li><a href='/api/team'>Equipos</a></li>
+        <li><a href='/api/player'>Jugadores</a></li>
       </ul>
-      <p>Take a look at the repositories <a href='https://github.com/iambrennanwalsh/symfony-5-http-cached-rest-api'>README</a> for more information on the app, and the exposed api routes.</p>
     {% endblock %}
   </body>
 </html>
