@@ -5,6 +5,7 @@ namespace App\Entity;
 use \DateTime;
 use Doctrine\ORM\Mapping as Orm;
 use Symfony\Component\Validator\Constraints as Assert;
+// use JMS\Serializer\Annotation\Type;
 
 class BaseEntity {
 	/**
@@ -19,25 +20,24 @@ class BaseEntity {
 	/**
 	 * @var DateTime
 	 * @Orm\Column(type="datetime")
-	 * @Assert\DateTime()
-	 * @Assert\NotBlank()
 	 */
 	protected $timestamp;
 
 	public function __construct() {
-		$this->setTimestamp(new DateTime());
+		$this->setTimestamp(new \DateTime());
 	}
 
 	public function getId(): ?int {
 		return $this->id;
 	}
 
-	public function getTimestamp(): DateTime {
+	public function getTimestamp(): ?\DateTimeInterface {
 		return $this->timestamp;
 	}
 
-	public function setTimestamp(DateTime $timestamp): self {
+	public function setTimestamp(\DateTimeInterface $timestamp): self {
 		$this->timestamp = $timestamp;
+		
 		return $this;
 	}
 }
