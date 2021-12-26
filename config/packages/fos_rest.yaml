@@ -2,8 +2,11 @@ fos_rest:
   zone:
     - {path: ^/api/*} # FOSRestBundle won't attempt to handle requests outside this path.
   view:
+    empty_content: 200
     view_response_listener: true
+    failed_validation: HTTP_BAD_REQUEST
   exception:
+    enabled: true
     codes:
       App\Exception\ResourceNotFoundException: 404
   format_listener:
@@ -14,3 +17,10 @@ fos_rest:
           fallback_format: json,
           priorities: [json]
         }
+      - {
+          path: ^/,
+          stop: true,
+          fallback_format: html
+        }
+  serializer:
+    serialize_null: true
