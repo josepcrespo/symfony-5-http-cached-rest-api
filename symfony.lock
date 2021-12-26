@@ -200,6 +200,9 @@
             "config/packages/test/nelmio_alice.yaml"
         ]
     },
+    "nikic/php-parser": {
+        "version": "v4.13.1"
+    },
     "ocramius/code-generator-utils": {
         "version": "1.0.0"
     },
@@ -387,11 +390,17 @@
     "symfony/lock": {
         "version": "v5.1.5"
     },
+    "symfony/maker-bundle": {
+        "version": "1.36",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.0",
+            "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
+        }
+    },
     "symfony/options-resolver": {
         "version": "v5.1.5"
-    },
-    "symfony/orm-pack": {
-        "version": "v2.0.0"
     },
     "symfony/password-hasher": {
         "version": "v5.3.4"
@@ -422,6 +431,9 @@
     },
     "symfony/property-info": {
         "version": "v5.1.5"
+    },
+    "symfony/proxy-manager-bridge": {
+        "version": "v5.3.11"
     },
     "symfony/routing": {
         "version": "5.1",
