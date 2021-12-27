@@ -22,7 +22,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN chmod +x /usr/local/bin/install-php-extensions && sync
 
 # Install php extensions and composer into image.
-RUN install-php-extensions pgsql pdo_pgsql opcache @composer
+RUN install-php-extensions pgsql pdo_pgsql opcache @composer xsl
 
 # Install additional software packages into image.
 RUN apk add --no-cache bash
