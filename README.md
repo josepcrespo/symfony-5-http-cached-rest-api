@@ -44,13 +44,13 @@ By default, `APP_URL` is set to `localhost` and, the final url will be `https://
 3. Execute migrations.
 
   ```bash
-  docker exec -t app_php_1 /bin/sh -c "php bin/console doctrine:migrations:migrate"
+  docker exec -t app-php-1 /bin/sh -c "php bin/console doctrine:migrations:migrate"
   ```
 
 4. Optionally install fixtures.
 
   ```bash
-  docker exec -t app_php_1 /bin/sh -c "php bin/console hautelook:fixtures:load"
+  docker exec -t app-php-1 /bin/sh -c "php bin/console hautelook:fixtures:load"
   ```
 
 **A note on POST, PUT, and DELETE Requests**:  
