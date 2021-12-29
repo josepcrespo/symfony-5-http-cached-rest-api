@@ -23,7 +23,7 @@ class Team extends BaseEntity
     private $emblem;
 
     /**
-     * @ORM\OneToMany(targetEntity=Player::class, mappedBy="team")
+     * @ORM\OneToMany(targetEntity=Player::class, mappedBy="team", cascade={"all"})
      */
     private $players;
 
