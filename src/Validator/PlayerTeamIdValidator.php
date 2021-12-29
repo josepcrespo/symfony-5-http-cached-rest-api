@@ -2,6 +2,7 @@
 
 namespace App\Validator;
 
+use App\Entity\Team;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -24,7 +25,7 @@ class PlayerTeamIdValidator extends ConstraintValidator
 
         // Validation
         if ($player->getTeamId() !== null) {
-            $teamRepository = $this->em->getRepository('App:Team');
+            $teamRepository = $this->em->getRepository(Team::class);
 
             // Check for the player salary.
             if (!$player->getSalary()) {
@@ -43,17 +44,22 @@ class PlayerTeamIdValidator extends ConstraintValidator
             }
 
             // Check for the salary limit of the team.
-            $teamSalaryLimit =
-                $teamRepository->find($player->getTeamId())->getSalaryLimit();
             if (
-                ($teamRepository->salaryExpense($player->getTeamId()) + $player->getSalary())
-                > $teamRepository->find($player->getTeamId())->getSalaryLimit()
+                $player->getTeamId() &&
+                $teamRepository->find($player->getTeamId())
             ) {
-                $this->context
-                    ->buildViolation($constraint::MAX_SALARY_EXPENSE)
-                    ->setParameter('{{ teamSalaryLimit }}', $teamSalaryLimit)
-                    ->atPath('salary')
-                    ->addViolation();
+                $teamSalaryLimit =
+                    $teamRepository->find($player->getTeamId())->getSalaryLimit();
+                if (
+                    ($teamRepository->salaryExpense($player->getTeamId()) + $player->getSalary())
+                    > $teamRepository->find($player->getTeamId())->getSalaryLimit()
+                ) {
+                    $this->context
+                        ->buildViolation($constraint::MAX_SALARY_EXPENSE)
+                        ->setParameter('{{ teamSalaryLimit }}', $teamSalaryLimit)
+                        ->atPath('salary')
+                        ->addViolation();
+                }
             }
         }
     }
