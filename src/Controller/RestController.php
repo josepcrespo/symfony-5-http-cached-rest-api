@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Player;
+use App\Entity\Team;
 use App\Exception\ResourceNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -10,6 +12,9 @@ use FOS\RestBundle\View\View;
 use Laminas\Hydrator\ReflectionHydrator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\NotifierInterface;
+use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -76,13 +81,15 @@ class RestController extends AbstractFOSRestController {
 	public function post(
 		string $resource,
 		Request $request,
-		ValidatorInterface $validator
+		ValidatorInterface $validator,
+		NotifierInterface $notifier,
+		EntityManagerInterface $entityManager
 	): View {
 		$args = $request->request->all();
 		if (!$args) {
 			$args = (array) json_decode($request->getContent());
 		}
-		$entity = new $resource();
+		$entity = new $resource($entityManager);
 		$hydrator = new ReflectionHydrator();
 		$hydrator->hydrate($args, $entity);
 		
@@ -101,6 +108,9 @@ class RestController extends AbstractFOSRestController {
 
 		$this->manager->persist($entity);
 		$this->manager->flush();
+		if ($entity instanceof Player) {
+			$this->sendNewPlayerEmail($entity, $notifier);
+		}
 		return View::create($entity, Response::HTTP_OK);
 	}
 
@@ -143,9 +153,10 @@ class RestController extends AbstractFOSRestController {
 
         return View::create($errors, new Response($errorsString));
     }
-
+	
 		$this->manager->persist($entity);
 		$this->manager->flush();
+	
 		return View::create($entity, Response::HTTP_OK);
 	}
 
@@ -166,5 +177,25 @@ class RestController extends AbstractFOSRestController {
 		$this->manager->remove($entity);
 		$this->manager->flush();
 		return View::create($entity, Response::HTTP_OK);
+	}
+
+	private function sendNewPlayerEmail(
+		Player $player,
+		NotifierInterface $notifier
+	): Void {
+			// Create a Notification that has to be sent
+			// using the "email" channel
+			$notification =
+				(new Notification('Has sido registrado en LaLiga', ['email']))
+					->content(
+						'Hola ' . $player->getName() . '! ' .
+						'Has sido dado de alta en la base de datos de LaLiga.'
+					);
+
+			// The receiver of the Notification
+			$recipient = new Recipient($player->getEmail());
+
+			// Send the notification to the recipient
+			$notifier->send($notification, $recipient);
 	}
 }

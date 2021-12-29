@@ -41,17 +41,14 @@ By default, `APP_URL` is set to `localhost` and, the final url will be `https://
 
 1. Rename `.env.dist` to `.env`. 
 2. Run `docker compose up`.
-3. Execute migrations.
-
-  ```bash
-  docker exec -t app-php-1 /bin/sh -c "php bin/console doctrine:migrations:migrate"
+3. Enter `https://localhost/` in your favorite web browser.
   ```
 
-4. Optionally install fixtures.
+## Local SMTP Mail Server
 
-  ```bash
-  docker exec -t app-php-1 /bin/sh -c "php bin/console hautelook:fixtures:load"
-  ```
+The app runs a local SMTP mail server, MailHog.
+
+MailHog runs a super simple SMTP server that hogs outgoing emails sent to it. You can see the hogged emails in a [web interface](https://localhost:8025/).
 
 **A note on POST, PUT, and DELETE Requests**:  
 In order to run any `POST`, `PUT`, or `DELETE` requests, you'll need to send a valid API key in the `X_AUTH_TOKEN` header. To aquire an API key, you'll need to create an inital user by installing the fixtures. Passwords, and API keys, are scrubbed from the JSON during serialization, so in order to actually retrieve the api key, you'll need to load up the database in an app like TablePlus.

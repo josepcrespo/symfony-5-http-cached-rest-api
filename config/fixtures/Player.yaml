@@ -5,3 +5,4 @@ App\Entity\Player:
     birth_date: '<numberBetween(1, 2003)>-<numberBetween(1, 12)>-<numberBetween(1, 28)>'
     position: 'Delantero'
     salary: <numberBetween(1, 31590909)>
+    email: '<email()>'

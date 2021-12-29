@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Entity\BaseEntity;
+use App\Entity\Team;
+use App\Repository\PlayerRepository;
 use App\Validator as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\PlayerRepository;
 use Symfony\Component\Validator\Constraints as Assert;
-// use JMS\Serializer\Annotation\Type;
  
 /**
  * @ORM\Entity(repositoryClass=PlayerRepository::class)
@@ -44,6 +45,11 @@ class Player extends BaseEntity
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="players", fetch="EAGER")
      */
     private $team;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $email;
 
     public function getId(): ?int
     {
@@ -104,11 +110,7 @@ class Player extends BaseEntity
 
     public function setTeamId(?int $team_id): self
     {
-        // $teamRepository = 
-        //     $this->getDoctrine()->getManager()->getRepository('App:Team');
-
         $this->team_id = $team_id;
-        // $this->setTeam($teamRepository->find($team_id));
 
         return $this;
     }
@@ -121,6 +123,18 @@ class Player extends BaseEntity
     public function setTeam(?Team $team): self
     {
         $this->team = $team;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }
