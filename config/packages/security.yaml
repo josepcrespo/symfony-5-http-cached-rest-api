@@ -19,3 +19,7 @@ security:
       pattern: ^/api/
       custom_authenticators:
         - App\Security\ApiTokenAuthenticator
+    main:
+      json_login:
+        check_path: api_login
+        username_path: email

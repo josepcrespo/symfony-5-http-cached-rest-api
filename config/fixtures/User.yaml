@@ -1,6 +1,6 @@
 App\Entity\User:
-  user_frodo_baggins:
-    name: 'Frodo Baggins'
-    email: 'frodo@shi.re'
-    password: 'shireHobbit'
+  admin_user:
+    name: 'Admin'
+    email: 'admin@laliga.com'
+    password: 'asdf1234'
     roles: ['ROLE_USER', 'ROLE_ADMIN']
