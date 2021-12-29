@@ -38,7 +38,7 @@ class TeamRepository extends ServiceEntityRepository
             ->select('sum(player.salary) as salary')
             ->setParameter('teamIdentifier', $team_id)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult() ?? 0;
     }
 
     // /**
