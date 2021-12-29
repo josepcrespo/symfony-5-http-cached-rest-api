@@ -14,7 +14,7 @@ final class Version20211202000352 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Add the `team` and` player` tables and, the relationships.';
     }
 
     public function up(Schema $schema): void
