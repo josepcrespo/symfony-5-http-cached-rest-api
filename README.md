@@ -253,3 +253,14 @@ class Kernel extends BaseKernel implements HttpCacheProvider {
 ## Additional Information
 
 And yeah I can't think of much more to cover just now. If you run into any issues, feel free to leave an issue, and ill adress them. And yeah. I hope this example is educational, and can help as many as possible.
+
+## Links of interest
+
+- [How to Work with Doctrine Associations / Relations - The ManyToOne / OneToMany Association](https://symfony.com/doc/current/doctrine/associations.html#the-manytoone-onetomany-association)
+- [Doctrine Events - Doctrine Entity Listeners](https://symfony.com/doc/current/doctrine/events.html#doctrine-entity-listeners)
+- [Creating and Sending Notifications](https://symfony.com/doc/5.3/notifier.html)
+- [Sending Emails with Mailer](https://symfony.com/doc/current/mailer.html)
+- [MailHog Tutorial](https://mailtrap.io/blog/mailhog-explained/)
+- [Login with json_login](https://symfonycasts.com/screencast/api-platform-security/json-login)
+- [Authentication errors with json_login](https://symfonycasts.com/screencast/api-platform-security/auth-errors)
+- [Security - json_login](https://symfony.com/doc/5.3/security.html#json-login)
