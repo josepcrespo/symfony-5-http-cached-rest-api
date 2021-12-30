@@ -41,8 +41,7 @@ By default, `APP_URL` is set to `localhost` and, the final url will be `https://
 
 1. Rename `.env.dist` to `.env`. 
 2. Run `docker compose up`.
-3. Enter `https://localhost/` in your favorite web browser.
-  ```
+3. Enter [https://localhost/](https://localhost/) in your favorite web browser.
 
 ## Local SMTP Mail Server
 
@@ -70,6 +69,68 @@ The following requests are accepted:
 **Note**: The `GET all` request accepts three query parameters: `order`, `limit`, and `offset`. These are passed directly to the Doctrine `findBy()` method. [Address the Doctrine documentation for further imformation](https://www.doctrine-project.org/projects/doctrine-orm/en/2.9/reference/working-with-objects.html#by-simple-conditions). 
 
 **Note**: The `POST`, `PUT`, and `DELETE` endpoints require that a valid api key is passed via the `X_AUTH_TOKEN` header. Take a look at `/src/Security/ApiTokenAuthenticator.php` and `/config/packages/security.yaml` to see how I implemented that.
+
+### REST API User login example
+
+Login with valid `user` and `password` credentials:
+
+```json
+// POST request to `/login`.
+// The body of the request should be set as `application/json`.
+{
+    "email": "admin@laliga.com",
+    "password": "asdf1234"
+}
+```
+
+```json
+// Success response to POST `/login` request.
+{
+    "email": "admin@laliga.com",
+    "api_token": "b5d0e7-3f163d-6a3227-c44d54-484b7d"
+}
+```
+
+### REST API New Team example
+
+```json
+// POST request to `/api/team`.
+// The body of the request should be set as `application/json`.
+// The request should include the `X_AUTH_TOKEN` HTTP header with a valid API token.
+{
+    "name": "Real Madrid",
+    "salary_limit": 55123456
+}
+```
+
+### REST API New Player example
+
+Valid values for the `position` property are as follows:
+
+- `Portero`
+- `Defensa`
+- `Centrocampista`
+- `Delantero`
+
+```json
+// POST request to `/api/player`.
+// The body of the request should be set as `application/json`
+// The request should include the `X_AUTH_TOKEN` HTTP header with a valid API token.
+{
+    "name": "Ronaldo",
+    "birth_date": "1985-02-05",
+    "position": "Delantero",
+    "salary": 26000000,
+    "team_id": 1,
+    "email": "ronaldo@fifa.com"
+}
+```
+
+### Postman request collection
+
+A collection of REST API requests that runs in Postman.
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/5d0acf2eb5520dc2edd6?action=collection%2Fimport)
 
 ## FOSHttpCacheBundle
 
