@@ -151,7 +151,7 @@ class RestController extends AbstractFOSRestController {
          */
         $errorsString = (string) $errors;
 
-        return View::create($errors, new Response($errorsString));
+        return View::create($errors, Response::HTTP_BAD_REQUEST);
     }
 	
 		$this->manager->persist($entity);
