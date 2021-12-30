@@ -36,7 +36,12 @@ class PlayerTeamIdValidator extends ConstraintValidator
             }
 
             // Check for the max number of players in the team.
-            if ($teamRepository->numOfPlayers($player->getTeamId()) >= 5) {
+            if (
+                (!$player->getId() &&
+                $teamRepository->numOfPlayers($player->getTeamId()) === $constraint::MAX_PLAYERS_NUM) ||
+                ($player->getId() &&
+                $teamRepository->numOfPlayers($player->getTeamId()) > $constraint::MAX_PLAYERS_NUM)
+            ) {
                 $this->context
                     ->buildViolation($constraint::MAX_PLAYERS)
                     ->atPath('team')

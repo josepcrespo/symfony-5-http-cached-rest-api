@@ -11,6 +11,7 @@ class PlayerTeamId extends Constraint
 {
     const NULL_SALARY = 'A player enrolled in a team must have a salary.';
     const MAX_PLAYERS = 'The max number (5) of players which can be enrolled in this team has been reached.';
+    const MAX_PLAYERS_NUM = 5;
     const MAX_SALARY_EXPENSE = 'The expense in salaries exceeds the maximum allowed for this team ({{ teamSalaryLimit }}).';
 
     /*
