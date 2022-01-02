@@ -1,41 +1,65 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>LaLiga Symfony 5 HTTP Rest API</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-      html {
-        background: #232526;
-        background: linear-gradient(to right, #414345, #232526);
-        color: #fff;
-        font-family: 'Hind', sans-serif; 
-      }
-      body {
-        padding: 1.25rem;
-      }
-      p {
-        color: #aaa;
-        max-width: 700px;
-      }
-      a {
-        color: #84B54D;
-        text-decoration: none;
-      }
-      a:hover {
-        color: #269e4a;
-      }
-    </style>
-  </head>
-  <body>
-    {% block body %}
-      <h1>LaLiga Symfony 5 HTTP Rest API</h1>
-      <p>Entidades de la aplicación. Se puede consumir cada recurso usando los verbos HTTP GET/POST/PUT/DELETE siguiendo el estándar REST.</p>
+	<head>
+		<meta charset="UTF-8">
+		<title>LaLiga Symfony 5 HTTP Rest API</title>
+		<link rel="icon" href="/favicon.ico" type="image/x-icon">
+		<link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+		<style>
+			html {
+				background: #232526;
+				background: linear-gradient(to right, #414345, #232526);
+				color: #fff;
+				font-family: 'Hind', sans-serif;
+			}
+			body {
+				padding: 1.25rem;
+			}
+			p {
+				color: #aaa;
+
+			}
+			a {
+				color: #84B54D;
+				text-decoration: none;
+			}
+			a:hover {
+				color: #269e4a;
+			}
+		</style>
+	</head>
+	<body>
+		{% block body %}
+			<h1>LaLiga Symfony 5 HTTP Rest API</h1>
+			<h3>Entidades de la aplicación</h3>
+      <p>Se puede consumir cada recurso usando los verbos HTTP: GET, POST, PUT y, DELETE, siguiendo el estándar REST.</p>
       <ul>
-        <li><a href='/api/user'>Usuarios</a></li>
-        <li><a href='/api/team'>Equipos</a></li>
-        <li><a href='/api/player'>Jugadores</a></li>
+        <li>
+          <a href="/api/user" target="_blank">GET Usuarios</a>
+        </li>
+        <li>
+          <a href="/api/team" target="_blank">GET Equipos</a>
+        </li>
+        <li>
+          <a href="/api/player" target="_blank">GET Jugadores</a>
+        </li>
+      </ul>
+      <h3>Collección de peticiones REST en Postman</h3>
+      <div class="postman-run-button" data-postman-action="collection/import" data-postman-var-1="5d0acf2eb5520dc2edd6"></div>
+      <script type="text/javascript">
+        (function (p, o, s, t, m, a, n) {
+          ! p[s] && (p[s] = function () {
+            (p[t] || (p[t] =[])).push(arguments);
+          });
+          ! o.getElementById(s + t) && o.getElementsByTagName("head")[0].appendChild(((n = o.createElement("script")), (n.id = s + t), (n.async = 1), (n.src = m), n));
+        }(window, document, "_pm", "PostmanRunObject", "https://run.pstmn.io/button.js"));
+      </script>
+      <h3>MailHog</h3>
+      <p>MailHog ejecuta un servidor SMTP súper simple que intercepta los correos electrónicos salientes que se le envían. Puede ver los correos electrónicos interceptados en una interfaz web.</p>
+      <ul>
+        <li>
+          <a href="http://localhost:8025/" target="_blank">Interfaz web de MailHog</a>
+        </li>
       </ul>
     {% endblock %}
   </body>
