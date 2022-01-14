@@ -15,6 +15,7 @@ class ApiLoginController extends AbstractController
     if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
       return $this->json([
             'email' => $this->getUser()->getEmail(),
+            'roles' => $this->getUser()->getRoles(),
         'api_token' => $this->getUser()->getApiToken()
       ]);
     } else {

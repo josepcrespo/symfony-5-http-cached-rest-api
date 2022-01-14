@@ -11,9 +11,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 class ApiTokenAuthenticator extends AbstractAuthenticator {
 	private $entityManager;
@@ -27,17 +27,28 @@ class ApiTokenAuthenticator extends AbstractAuthenticator {
 	}
 
 	public function authenticate(Request $request): PassportInterface {
-		$apiToken = $request->headers->get('X-AUTH-TOKEN');
+		$apiToken = '';
+		// Supporting two methods for sending the api token.
+		if ($request->headers->has('X-AUTH-TOKEN')) {
+			$apiToken = $request->headers->get('X-AUTH-TOKEN');
+		} else if (
+			$request->headers->has('Authorization') &&
+		  0 === strpos($request->headers->get('Authorization'), 'Bearer ')
+		) {
+			$apiToken =	substr($request->headers->get('Authorization'), 7);
+		}
+		
 		if ($apiToken) {
 			$user = $this->entityManager
-				->getRepository(User::class)
-				->findOneBy(['apiToken' => $apiToken]);
+			->getRepository(User::class)
+			->findOneBy(['apiToken' => $apiToken]);
 			if ($user) {
 				return new SelfValidatingPassport(new UserBadge($user->getEmail()), []);
 			}
 		}
+
 		throw new CustomUserMessageAuthenticationException(
-			'Invalid API token provided. To perform that operation, please provide a valid API token.'
+			'Please, provide a valid API token.'
 		);
 	}
 
