@@ -6,7 +6,11 @@ use App\Entity\BaseEntity;
 use App\Entity\Team;
 use App\Repository\PlayerRepository;
 use App\Validator as AppAssert;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Type as JSMType;
 use Symfony\Component\Validator\Constraints as Assert;
  
 /**
@@ -21,7 +25,11 @@ class Player extends BaseEntity
     private $name;
 
     /**
-     * @ORM\Column(type="string")
+     * @Assert\Type("DateTimeImmutable")
+     * @JSMType("DateTime<'Y-m-d'>") // It only works with GET requests.
+     * @JSMType("DateTimeImmutable<'Y-m-d'>") // It only works with POST/PUT requests.
+     * @JSMType("DateTimeInterface<'Y-m-d'>") // It works with all kind of requests.
+	 * @Orm\Column(type="datetime")
      */
     private $birth_date;
 
@@ -68,12 +76,12 @@ class Player extends BaseEntity
         return $this;
     }
 
-    public function getBirthDate(): ?string
+    public function getBirthDate(): ?DateTimeInterface
     {
         return $this->birth_date;
     }
 
-    public function setBirthDate(string $birth_date): self
+    public function setBirthDate(DateTimeInterface  $birth_date): self
     {
         $this->birth_date = $birth_date;
 

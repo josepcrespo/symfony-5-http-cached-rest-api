@@ -10,6 +10,9 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Laminas\Hydrator\ReflectionHydrator;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Hydrator\Strategy\DateTimeImmutableFormatterStrategy;
+use Laminas\Hydrator\Strategy\HydratorStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -138,7 +141,19 @@ class RestController extends AbstractFOSRestController {
 		if (!$args) {
 			$args = (array) json_decode($request->getContent());
 		}
+
 		$hydrator = new ReflectionHydrator();
+		
+		// Correctly hydrate 'birth_date', a DateTime type property,
+		// present on the Player entities.
+		$hydrator->addStrategy(
+			'birth_date',
+			new DateTimeImmutableFormatterStrategy(
+				new DateTimeFormatterStrategy('Y-m-d')
+			)
+		);
+		
+		// Hydrate the $entity object with the values on $args.
 		$hydrator->hydrate($args, $entity);
 		
 		// Validation
