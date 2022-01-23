@@ -25,7 +25,6 @@ class Player extends BaseEntity
     private $name;
 
     /**
-     * @Assert\Type("DateTimeInterface")
      * @JMSType("DateTime<'Y-m-d'>") // It only works with GET requests.
      * @JMSType("DateTimeImmutable<'Y-m-d'>") // It only works with POST/PUT requests.
      * @JMSType("DateTimeInterface<'Y-m-d'>") // It works with all kind of requests.
