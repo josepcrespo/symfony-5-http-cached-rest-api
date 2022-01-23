@@ -10,7 +10,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Type as JSMType;
+use JMS\Serializer\Annotation\Type as JMSType;
 use Symfony\Component\Validator\Constraints as Assert;
  
 /**
@@ -25,10 +25,10 @@ class Player extends BaseEntity
     private $name;
 
     /**
-     * @Assert\Type("DateTimeImmutable")
-     * @JSMType("DateTime<'Y-m-d'>") // It only works with GET requests.
-     * @JSMType("DateTimeImmutable<'Y-m-d'>") // It only works with POST/PUT requests.
-     * @JSMType("DateTimeInterface<'Y-m-d'>") // It works with all kind of requests.
+     * @Assert\Type("DateTimeInterface")
+     * @JMSType("DateTime<'Y-m-d'>") // It only works with GET requests.
+     * @JMSType("DateTimeImmutable<'Y-m-d'>") // It only works with POST/PUT requests.
+     * @JMSType("DateTimeInterface<'Y-m-d'>") // It works with all kind of requests.
 	 * @Orm\Column(type="datetime")
      */
     private $birth_date;
