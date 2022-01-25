@@ -19,24 +19,24 @@ class TeamRepository extends ServiceEntityRepository
         parent::__construct($registry, Team::class);
     }
 
-    public function numOfPlayers($team_id): int
+    public function numOfPlayers($teamId): int
     {
         return $this->createQueryBuilder('t')
             ->select('count(t.id)')
             ->andWhere('t.id = :teamIdentifier')
             ->InnerJoin('t.players', 'player')
-            ->setParameter('teamIdentifier', $team_id)
+            ->setParameter('teamIdentifier', $teamId)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    public function salaryExpense($team_id): int
+    public function salaryExpense($teamId): int
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.id = :teamIdentifier')
             ->InnerJoin('t.players', 'player')
             ->select('sum(player.salary) as salary')
-            ->setParameter('teamIdentifier', $team_id)
+            ->setParameter('teamIdentifier', $teamId)
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
     }

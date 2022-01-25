@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-class PlayerTeamId extends Constraint
+class PlayerTeam extends Constraint
 {
     const NULL_SALARY = 'A player enrolled in a team must have a salary.';
     const MAX_PLAYERS = 'The max number (5) of players which can be enrolled in this team has been reached.';

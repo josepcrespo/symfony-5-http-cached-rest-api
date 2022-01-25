@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  
 /**
  * @ORM\Entity(repositoryClass=PlayerRepository::class)
- * @AppAssert\PlayerTeamId
+ * @AppAssert\PlayerTeam
  */
 class Player extends BaseEntity
 {
@@ -25,9 +25,7 @@ class Player extends BaseEntity
     private $name;
 
     /**
-     * @JMSType("DateTime<'Y-m-d'>") // It only works with GET requests.
-     * @JMSType("DateTimeImmutable<'Y-m-d'>") // It only works with POST/PUT requests.
-     * @JMSType("DateTimeInterface<'Y-m-d'>") // It works with all kind of requests.
+     * @JMSType("DateTimeInterface<'Y-m-d'>")
 	 * @Orm\Column(type="datetime")
      */
     private $birth_date;
@@ -42,11 +40,6 @@ class Player extends BaseEntity
      * @ORM\Column(type="integer", nullable=true)
      */
     private $salary;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $team_id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="players", fetch="EAGER")
@@ -106,18 +99,6 @@ class Player extends BaseEntity
     public function setSalary(?int $salary): self
     {
         $this->salary = $salary;
-
-        return $this;
-    }
-
-    public function getTeamId(): ?int
-    {
-        return $this->team_id;
-    }
-
-    public function setTeamId(?int $team_id): self
-    {
-        $this->team_id = $team_id;
 
         return $this;
     }

@@ -6,3 +6,6 @@ framework:
     cookie_samesite: lax
   php_errors:
     log: true
+  csrf_protection:
+    # https://symfony.com/doc/5.3/reference/configuration/framework.html#enabled
+    enabled: false

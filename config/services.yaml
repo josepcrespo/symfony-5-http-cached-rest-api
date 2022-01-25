@@ -27,11 +27,4 @@ services:
     class: 'App\EventListener\ResourceResolvingListener'
     tags:
       - {name: kernel.event_listener, priority: 1}
-        
-  App\EventListener\PlayerTeamIdListener:
-    tags:
-        -
-          # these are the options required to define the entity listener
-          name: 'doctrine.orm.entity_listener'
-          event: 'prePersist'
-          entity: 'App\Entity\Player'
+

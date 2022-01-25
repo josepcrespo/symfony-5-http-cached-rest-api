@@ -5,45 +5,43 @@ namespace App\Controller;
 use App\Entity\Player;
 use App\Entity\Team;
 use App\Exception\ResourceNotFoundException;
+use App\Form\PlayerType;
+use App\Form\TeamType;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations as RestAnnotation;
 use FOS\RestBundle\View\View;
-use Laminas\Hydrator\ReflectionHydrator;
-use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Hydrator\Strategy\DateTimeImmutableFormatterStrategy;
-use Laminas\Hydrator\Strategy\HydratorStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * The rest api routes.
  */
-class RestController extends AbstractFOSRestController {
+class RestController extends AbstractFOSRestController
+{
 	/**
 	 * @var EntityManagerInterface
 	 */
-	private $manager;
+	private $entityManager;
 
-	public function __construct(EntityManagerInterface $manager) {
-		$this->manager = $manager;
+	public function __construct(EntityManagerInterface $entityManager) {
+		$this->entityManager = $entityManager;
 	}
 
 	/**
 	 * Returns a resource with a matching id.
 	 *
 	 * @param string $resource
-	 * @param string $document
+	 * @param string $id
 	 * @return View
 	 * @throws ResourceNotFoundException
-	 * @Rest\Get("/{resource}/{id}")
+	 * @RestAnnotation\Get("/{resource}/{id}")
 	 */
 	public function getOne(string $resource, string $id): View {
-		$repository = $this->manager->getRepository($resource);
+		$repository = $this->entityManager->getRepository($resource);
 		$entity = $repository->findOneBy(['id' => $id]);
 		if (!$entity) {
 			throw new ResourceNotFoundException($resource, $id);
@@ -57,10 +55,10 @@ class RestController extends AbstractFOSRestController {
 	 * @param string $resource The name of the resource.
 	 * @param Request $request
 	 * @return View
-	 * @Rest\Get("/{resource}")
+	 * @RestAnnotation\Get("/{resource}")
 	 */
 	public function getMany(string $resource, Request $request): View {
-		$repository = $this->manager->getRepository($resource);
+		$repository = $this->entityManager->getRepository($resource);
 		if ($query = $request->query->all()) {
 			$args = ['order' => null, 'limit' => null, 'offset' => null];
 			$query = array_merge($args, $query);
@@ -79,42 +77,31 @@ class RestController extends AbstractFOSRestController {
 	 * @param string $resource
 	 * @param Request $request
 	 * @return View
-	 * @Rest\Post("/{resource}")
+	 * @RestAnnotation\Post("/{resource}")
 	 */
 	public function post(
 		string $resource,
 		Request $request,
-		ValidatorInterface $validator,
-		NotifierInterface $notifier,
-		EntityManagerInterface $entityManager
+		NotifierInterface $notifier
 	): View {
-		$args = $request->request->all();
-		if (!$args) {
-			$args = (array) json_decode($request->getContent());
-		}
-		$entity = new $resource($entityManager);
-		$hydrator = new ReflectionHydrator();
-		$hydrator->hydrate($args, $entity);
-		
-		// Validation
-		$errors = $validator->validate($entity);
-		if (count($errors) > 0) {
-        /*
-         * Uses a __toString method on the $errors variable which is a
-         * ConstraintViolationList object. This gives us a nice string
-         * for debugging.
-         */
-        // $errorsString = (string) $errors;
+		$requestBody = $request->request->all()
+			? $request->request->all()
+			: (array) json_decode($request->getContent());
+		$entity = new $resource($this->entityManager);
 
-        return View::create($errors, Response::HTTP_BAD_REQUEST);
-    }
-
-		$this->manager->persist($entity);
-		$this->manager->flush();
-		if ($entity instanceof Player) {
-			$this->sendNewPlayerEmail($entity, $notifier);
+		$form = $this->createForm(PlayerType::class, $entity);
+		$form->submit($requestBody);
+			
+		if ($form->isSubmitted() && $form->isValid()) {
+			$this->entityManager->persist($entity);
+			$this->entityManager->flush();
+			if ($entity instanceof Player) {
+				$this->sendNewPlayerEmail($entity, $notifier);
+			}
+			return View::create($entity, Response::HTTP_OK);
+		} else {
+			return View::create($form, Response::HTTP_BAD_REQUEST);
 		}
-		return View::create($entity, Response::HTTP_OK);
 	}
 
 	/**
@@ -124,55 +111,40 @@ class RestController extends AbstractFOSRestController {
 	 * @param string  $id
 	 * @param Request $request
 	 * @return View
-	 * @Rest\Put("/{resource}/{id}")
+	 * @RestAnnotation\Put(path="/{resource}/{id}")
 	 */
 	public function put(
 		string $resource,
 		string $id,
-		Request $request,
-		ValidatorInterface $validator
+		Request $request
 	): View {
-		$repository = $this->manager->getRepository($resource);
+		$requestBody = $request->request->all()
+			? $request->request->all()
+			: (array) json_decode($request->getContent());
+		$repository = $this->entityManager->getRepository($resource);
 		$entity = $repository->findOneBy(['id' => $id]);
 		if (!$entity) {
 			throw new ResourceNotFoundException($resource, $id);
 		}
-		$args = $request->request->all();
-		if (!$args) {
-			$args = (array) json_decode($request->getContent());
-		}
-
-		$hydrator = new ReflectionHydrator();
-		
-		// Correctly hydrate 'birth_date', a DateTime type property,
-		// present on the Player entities.
-		$hydrator->addStrategy(
-			'birth_date',
-			new DateTimeImmutableFormatterStrategy(
-				new DateTimeFormatterStrategy('Y-m-d')
-			)
+		$reflectedClass = new \ReflectionClass($entity);
+		$formTypeClass = 'App\Form\\' . $reflectedClass->getShortName() . 'Type';
+		$symfonyFormType = new $formTypeClass();
+		$form = $this->createForm(
+			$symfonyFormType::class,
+			$entity,
+			[ 'method' => 'PUT' ]
 		);
+		// Don't set fields to NULL when they are missing in the submitted data.
+		// https://stackoverflow.com/a/25295370/2332731
+		$form->submit($requestBody, false);
 		
-		// Hydrate the $entity object with the values on $args.
-		$hydrator->hydrate($args, $entity);
-		
-		// Validation
-		$errors = $validator->validate($entity);
-		if (count($errors) > 0) {
-        /*
-         * Uses a __toString method on the $errors variable which is a
-         * ConstraintViolationList object. This gives us a nice string
-         * for debugging.
-         */
-        $errorsString = (string) $errors;
-
-        return View::create($errors, Response::HTTP_BAD_REQUEST);
-    }
-	
-		$this->manager->persist($entity);
-		$this->manager->flush();
-	
-		return View::create($entity, Response::HTTP_OK);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$this->entityManager->persist($entity);
+			$this->entityManager->flush();
+			return View::create($entity, Response::HTTP_OK);
+		} else {
+			return View::create($form, Response::HTTP_BAD_REQUEST);
+		}
 	}
 
 	/**
@@ -181,16 +153,16 @@ class RestController extends AbstractFOSRestController {
 	 * @param string $resource
 	 * @param string $id
 	 * @return View
-	 * @Rest\Delete("/{resource}/{id}")
+	 * @RestAnnotation\Delete("/{resource}/{id}")
 	 */
 	public function delete(string $resource, string $id): View {
-		$repository = $this->manager->getRepository($resource);
+		$repository = $this->entityManager->getRepository($resource);
 		$entity = $repository->findOneBy(['id' => $id]);
 		if (!$entity) {
 			throw new ResourceNotFoundException($resource, $id);
 		}
-		$this->manager->remove($entity);
-		$this->manager->flush();
+		$this->entityManager->remove($entity);
+		$this->entityManager->flush();
 		return View::create($entity, Response::HTTP_OK);
 	}
 
