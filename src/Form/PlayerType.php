@@ -22,13 +22,10 @@ class PlayerType extends AbstractType
    */
   private const FORM_NAME = '';
 
-  /**
-   * @var string
-   */
-
   public function buildForm(FormBuilderInterface $builder, array $options): void
   {
     $builder
+      ->add('id', IntegerType::class, ['required' => true])
       ->add('name', TextType::class, ['required' => true])
       ->add('birth_date', DateType::class, [
                'input' => 'datetime',

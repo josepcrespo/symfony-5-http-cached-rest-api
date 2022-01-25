@@ -11,9 +11,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TeamType extends AbstractType
 {
+  /**
+   * @var string
+   */
+  private const FORM_NAME = '';
+  
   public function buildForm(FormBuilderInterface $builder, array $options): void
   {
     $builder
+      ->add('id', IntegerType::class, ['required' => true])
       ->add('name', TextType::class, ['required' => true])
       ->add('emblem', TextType::class, ['required' => false])
       ->add('salary_limit', IntegerType::class, ['required' => true])
