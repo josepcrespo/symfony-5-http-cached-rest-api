@@ -36,7 +36,6 @@ class PlayerType extends AbstractType
       ->add('position', TextType::class, ['required' => true])
       ->add('salary', IntegerType::class, ['required' => false])
       ->add('email', EmailType::class, ['required' => true])
-      // ->add('team_id', IntegerType::class, ['required' => false])
       // https://fosrestbundle.readthedocs.io/en/3.x/2-the-view-layer.html#data-transformation
       // https://github.com/sonata-project/SonataAdminBundle/issues/3575#issuecomment-180790948
       // https://symfony.com/doc/5.3/reference/forms/types/entity.html#choice-label
