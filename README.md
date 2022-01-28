@@ -92,17 +92,17 @@ The following requests are accepted:
 
 Login with valid `user` and `password` credentials:
 
+POST request to `/login`.
+The body of the request should be set as `application/json`.
 ```json
-// POST request to `/login`.
-// The body of the request should be set as `application/json`.
 {
     "email": "admin@laliga.com",
     "password": "asdf1234"
 }
 ```
 
+Success response to POST `/login` request.
 ```json
-// Success response to POST `/login` request.
 {
     "email": "admin@laliga.com",
     "api_token": "b5d0e7-3f163d-6a3227-c44d54-484b7d"
