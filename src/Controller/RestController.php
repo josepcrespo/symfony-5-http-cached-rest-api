@@ -100,7 +100,39 @@ class RestController extends AbstractFOSRestController
 			}
 			return View::create($entity, Response::HTTP_OK);
 		} else {
-			return View::create($form, Response::HTTP_BAD_REQUEST);
+			/**
+			 * Instead of returning the $form itself,
+			 * returning $form->getErrors(true) will return all errors in a flat array.
+			 *
+			 * Output sample:
+       * {
+       *   "form": {
+       *     "code": 400,
+       *     "message": "Validation Failed",
+       *     "errors": {
+       *       "children": {
+       *         "id": {},
+       *         "name": {},
+       *         "birth_date": {},
+       *         "position": {},
+       *         "salary": {
+       *           "errors": [
+       *             "A player enrolled in a team must have a salary.",
+       *             "The expense in salaries exceeds the maximum allowed for this team (4925047)."
+       *           ]
+       *         },
+       *         "email": {},
+       *         "team": {}
+       *       }
+       *     }
+       *   },
+       *   "errors": [
+       *     "A player enrolled in a team must have a salary.",
+       *     "The expense in salaries exceeds the maximum allowed for this team (4925047)."
+       *   ]
+       * }
+       */
+			return View::create($form->getErrors(true), Response::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -143,7 +175,7 @@ class RestController extends AbstractFOSRestController
 			$this->entityManager->flush();
 			return View::create($entity, Response::HTTP_OK);
 		} else {
-			return View::create($form, Response::HTTP_BAD_REQUEST);
+			return View::create($form->getErrors(true), Response::HTTP_BAD_REQUEST);
 		}
 	}
 
