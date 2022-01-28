@@ -3,5 +3,5 @@ App\Entity\Player:
     name: <word()>
     birth_date: '<dateTimeBetween("-16425 days", "now")>'
     position: 'Delantero'
-    salary: <numberBetween(1, 31590909)>
+    salary: <numberBetween(1, 1590909)>
     email: '<email()>'
