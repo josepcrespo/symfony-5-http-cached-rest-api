@@ -68,7 +68,7 @@ MailHog runs a super simple SMTP server that hogs outgoing emails sent to it. Yo
 
 **A note on POST, PUT, and DELETE Requests**:  
 
-In order to run any `POST`, `PUT`, or `DELETE` requests, you'll need to send a valid API key in the `X-AUTH-TOKEN` header. To acquire an API key, you'll need to create an initial user by installing the fixtures. Passwords, and API keys, are scrubbed from the JSON during serialization, so in order to actually retrieve the api key, you'll need to load up the database in an app like TablePlus.
+In order to run any `POST`, `PUT`, or `DELETE` requests, you'll need to send a valid API key in the `X-AUTH-TOKEN` header or using the Bearer token strategy. To acquire an API key, you'll need to create an initial user by installing the fixtures. Passwords, and API keys, are scrubbed from the JSON during serialization, so in order to actually retrieve the api key, you'll need to load up the database in an app like TablePlus.
 
 ## FOSRestBundle
 
@@ -86,7 +86,7 @@ The following requests are accepted:
 
 **Note**: The `GET all` request accepts three query parameters: `order`, `limit`, and `offset`. These are passed directly to the Doctrine `findBy()` method. [Address the Doctrine documentation for further information](https://www.doctrine-project.org/projects/doctrine-orm/en/2.9/reference/working-with-objects.html#by-simple-conditions). 
 
-**Note**: The `POST`, `PUT`, and `DELETE` endpoints require that a valid api key is passed via the `X-AUTH-TOKEN` header. Take a look at `/src/Security/ApiTokenAuthenticator.php` and `/config/packages/security.yaml` to see how I implemented that.
+**Note**: The `POST`, `PUT`, and `DELETE` endpoints require that a valid api key is passed via the `X-AUTH-TOKEN` header or using the Bearer token strategy. Take a look at `/src/Security/ApiTokenAuthenticator.php` and `/config/packages/security.yaml` to see how I implemented that.
 
 ### REST API User login example
 
@@ -111,10 +111,10 @@ Login with valid `user` and `password` credentials:
 
 ### REST API New Team example
 
+POST request to `/api/team`.
+The body of the request should be set as `application/json`.
+The request should include the `X-AUTH-TOKEN` HTTP header, or follow the Bearer token strategy, with a valid API token.
 ```json
-// POST request to `/api/team`.
-// The body of the request should be set as `application/json`.
-// The request should include the `X-AUTH-TOKEN` HTTP header with a valid API token.
 {
     "name": "Real Madrid",
     "salary_limit": 55123456
@@ -130,16 +130,16 @@ Valid values for the `position` property are as follows:
 - `Centrocampista`
 - `Delantero`
 
+POST request to `/api/player`.
+The body of the request should be set as `application/json`.
+The request should include the `X-AUTH-TOKEN` HTTP header, or follow the Bearer token strategy, with a valid API token.
 ```json
-// POST request to `/api/player`.
-// The body of the request should be set as `application/json`
-// The request should include the `X-AUTH-TOKEN` HTTP header with a valid API token.
 {
     "name": "Ronaldo",
     "birth_date": "1985-02-05",
     "position": "Delantero",
-    "salary": 26000000,
-    "team_id": 1,
+    "salary": 2600000,
+    "team": 1,
     "email": "ronaldo@fifa.com"
 }
 ```
