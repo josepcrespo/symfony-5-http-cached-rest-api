@@ -14,7 +14,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-
 class PlayerType extends AbstractType
 {
   /**
@@ -40,8 +39,8 @@ class PlayerType extends AbstractType
       // https://github.com/sonata-project/SonataAdminBundle/issues/3575#issuecomment-180790948
       // https://symfony.com/doc/5.3/reference/forms/types/entity.html#choice-label
       ->add('team', EntityType::class, [
-              'class' => Team::class,
-          'required' => false
+           'class' => Team::class,
+        'required' => false
       ]);
   }
 
