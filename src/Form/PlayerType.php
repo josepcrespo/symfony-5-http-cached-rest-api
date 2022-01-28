@@ -41,9 +41,8 @@ class PlayerType extends AbstractType
       // https://github.com/sonata-project/SonataAdminBundle/issues/3575#issuecomment-180790948
       // https://symfony.com/doc/5.3/reference/forms/types/entity.html#choice-label
       ->add('team', EntityType::class, [
-               'class' => Team::class,
-        'choice_label' => 'id',
-            'required' => false
+              'class' => Team::class,
+          'required' => false
       ]);
   }
 
