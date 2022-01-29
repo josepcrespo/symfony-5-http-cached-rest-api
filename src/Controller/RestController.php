@@ -84,13 +84,10 @@ class RestController extends AbstractFOSRestController
 		Request $request,
 		NotifierInterface $notifier
 	): View {
-		$requestBody = $request->request->all()
-			? $request->request->all()
-			: (array) json_decode($request->getContent());
 		$entity = new $resource($this->entityManager);
 
 		$form = $this->createForm(PlayerType::class, $entity);
-		$form->submit($requestBody);
+		$form->submit($request->request->all());
 			
 		if ($form->isSubmitted() && $form->isValid()) {
 			$this->entityManager->persist($entity);
@@ -150,9 +147,6 @@ class RestController extends AbstractFOSRestController
 		string $id,
 		Request $request
 	): View {
-		$requestBody = $request->request->all()
-			? $request->request->all()
-			: (array) json_decode($request->getContent());
 		$repository = $this->entityManager->getRepository($resource);
 		$entity = $repository->findOneBy(['id' => $id]);
 		if (!$entity) {
@@ -168,7 +162,7 @@ class RestController extends AbstractFOSRestController
 		);
 		// Don't set fields to NULL when they are missing in the submitted data.
 		// https://stackoverflow.com/a/25295370/2332731
-		$form->submit($requestBody, false);
+		$form->submit($request->request->all(), false);
 		
 		if ($form->isSubmitted() && $form->isValid()) {
 			$this->entityManager->persist($entity);

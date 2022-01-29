@@ -1,10 +1,17 @@
 fos_rest:
-  zone:
-    - {path: ^/api/*} # FOSRestBundle won't attempt to handle requests outside this path.
-  view:
-    empty_content: 200
-    view_response_listener: true
-    failed_validation: HTTP_BAD_REQUEST
+  # https://stackoverflow.com/a/38268889/2332731
+  # http://symfony.com/doc/current/bundles/FOSRestBundle/3-listener-support.html#body-listener
+  # The Request body listener makes it possible to decode the contents of a
+  # request in order to populate the "request" parameter bag of the Request.
+  # This, for example, allows to receive data that normally would be sent
+  # via POST as application/x-www-form-urlencoded in a different format (for
+  # example application/json) in a PUT.
+  #
+  # This way, we can get all parameters sent through an application/json request
+  # into the $request->request->all() bag and use it directly in our controllers.
+  body_listener:
+    decoders:
+      json: fos_rest.decoder.json
   exception:
     enabled: true
     codes:
@@ -15,12 +22,15 @@ fos_rest:
           path: ^/api,
           prefer_extension: true,
           fallback_format: json,
-          priorities: [json]
+          priorities: [json],
         }
-      - {
-          path: ^/,
-          stop: true,
-          fallback_format: html
-        }
+      - { path: ^/, stop: true, fallback_format: html }
   serializer:
     serialize_null: true
+  view:
+    empty_content: 200
+    view_response_listener: true
+    failed_validation: HTTP_BAD_REQUEST
+  zone:
+    # FOSRestBundle won't attempt to handle requests outside this path.
+    - { path: ^/api/* }
