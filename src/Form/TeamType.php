@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Team;
+use App\Form\PlayerType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,7 +25,15 @@ class TeamType extends AbstractType
       ->add('name', TextType::class, ['required' => true])
       ->add('emblem', TextType::class, ['required' => false])
       ->add('salary_limit', IntegerType::class, ['required' => true])
-      ;
+      ->add('players', CollectionType::class, [
+              'allow_add' => true,
+           'allow_delete' => true,
+           'by_reference' => false,
+           'delete_empty' => true,
+             'entry_type' => PlayerType::class,
+        'invalid_message' => 'Not valid player.',
+               'required' => false
+      ]);
   }
 
   public function configureOptions(OptionsResolver $resolver): void
