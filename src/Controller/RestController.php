@@ -7,6 +7,8 @@ use App\Entity\Team;
 use App\Exception\ResourceNotFoundException;
 use App\Form\PlayerType;
 use App\Form\TeamType;
+use App\Service\FileUploader;
+
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as RestAnnotation;
@@ -22,86 +24,96 @@ use Symfony\Component\Notifier\Recipient\Recipient;
  */
 class RestController extends AbstractFOSRestController
 {
-	/**
-	 * @var EntityManagerInterface
-	 */
-	private $entityManager;
+  /**
+   * @var EntityManagerInterface
+   */
+  private $entityManager;
 
-	public function __construct(EntityManagerInterface $entityManager) {
-		$this->entityManager = $entityManager;
-	}
+  public function __construct(EntityManagerInterface $entityManager) {
+    $this->entityManager = $entityManager;
+  }
 
-	/**
-	 * Returns a resource with a matching id.
-	 *
-	 * @param string $resource
-	 * @param string $id
-	 * @return View
-	 * @throws ResourceNotFoundException
-	 * @RestAnnotation\Get("/{resource}/{id}")
-	 */
-	public function getOne(string $resource, string $id): View {
-		$repository = $this->entityManager->getRepository($resource);
-		$entity = $repository->findOneBy(['id' => $id]);
-		if (!$entity) {
-			throw new ResourceNotFoundException($resource, $id);
-		}
-		return View::create($entity, Response::HTTP_OK);
-	}
+  /**
+   * Returns a resource with a matching id.
+   *
+   * @param string $resource
+   * @param string $id
+   * @return View
+   * @throws ResourceNotFoundException
+   * @RestAnnotation\Get("/{resource}/{id}")
+   */
+  public function getOne(string $resource, string $id): View {
+    $repository = $this->entityManager->getRepository($resource);
+    $entity = $repository->findOneBy(['id' => $id]);
+    if (!$entity) {
+      throw new ResourceNotFoundException($resource, $id);
+    }
+    return View::create($entity, Response::HTTP_OK);
+  }
 
-	/**
-	 * Returns the result of a query.
-	 *
-	 * @param string $resource The name of the resource.
-	 * @param Request $request
-	 * @return View
-	 * @RestAnnotation\Get("/{resource}")
-	 */
-	public function getMany(string $resource, Request $request): View {
-		$repository = $this->entityManager->getRepository($resource);
-		if ($query = $request->query->all()) {
-			$args = ['order' => null, 'limit' => null, 'offset' => null];
-			$query = array_merge($args, $query);
-			$args = array_intersect_key($query, $args);
-			$query = array_diff_key($query, $args);
-			$resource = $repository->findBy($query, ...$args);
-		} else {
-			$resource = $repository->findAll();
-		}
-		return View::create($resource, Response::HTTP_OK);
-	}
+  /**
+   * Returns the result of a query.
+   *
+   * @param string $resource The name of the resource.
+   * @param Request $request
+   * @return View
+   * @RestAnnotation\Get("/{resource}")
+   */
+  public function getMany(string $resource, Request $request): View {
+    $repository = $this->entityManager->getRepository($resource);
+    if ($query = $request->query->all()) {
+      $args = ['order' => null, 'limit' => null, 'offset' => null];
+      $query = array_merge($args, $query);
+      $args = array_intersect_key($query, $args);
+      $query = array_diff_key($query, $args);
+      $resource = $repository->findBy($query, ...$args);
+    } else {
+      $resource = $repository->findAll();
+    }
+    return View::create($resource, Response::HTTP_OK);
+  }
 
-	/**
-	 * Inserts a resource and returns the result.
-	 *
-	 * @param string $resource
-	 * @param Request $request
-	 * @return View
-	 * @RestAnnotation\Post("/{resource}")
-	 */
-	public function post(
-		string $resource,
-		Request $request,
-		NotifierInterface $notifier
-	): View {
-		$entity = new $resource($this->entityManager);
+  /**
+   * Inserts a resource and returns the result.
+   *
+   * @param string $resource
+   * @param Request $request
+   * @return View
+   * @RestAnnotation\Post("/{resource}")
+   */
+  public function post(
+    string $resource,
+    Request $request,
+    NotifierInterface $notifier,
+    FileUploader $fileUploader
+  ): View {
+    $entity = new $resource($this->entityManager);
+    $reflectedClass = new \ReflectionClass($entity);
+    $formTypeClass = 'App\Form\\' . $reflectedClass->getShortName() . 'Type';
+    $symfonyFormType = new $formTypeClass();
+    $form = $this->createForm($symfonyFormType::class, $entity);
+    $form->submit($request->request->all());
 
-		$form = $this->createForm(PlayerType::class, $entity);
-		$form->submit($request->request->all());
-			
-		if ($form->isSubmitted() && $form->isValid()) {
-			$this->entityManager->persist($entity);
-			$this->entityManager->flush();
-			if ($entity instanceof Player) {
-				$this->sendNewPlayerEmail($entity, $notifier);
-			}
-			return View::create($entity, Response::HTTP_OK);
-		} else {
-			/**
-			 * Instead of returning the $form itself,
-			 * returning $form->getErrors(true) will return all errors in a flat array.
-			 *
-			 * Output sample:
+    if ($form->isSubmitted() && $form->isValid()) {
+      if ($entity instanceof Team) {
+        $imageFile = $request->files->get('emblem');
+        if ($imageFile) {
+          $imageFileName = $fileUploader->upload($imageFile);
+          $entity->setEmblem($imageFileName);
+        }
+      }
+      $this->entityManager->persist($entity);
+      $this->entityManager->flush();
+      if ($entity instanceof Player) {
+        $this->sendNewPlayerEmail($entity, $notifier);
+      }
+      return View::create($entity, Response::HTTP_OK);
+    } else {
+      /**
+       * Instead of returning the $form itself,
+       * returning $form->getErrors(true) will return all errors in a flat array.
+       *
+       * Output sample:
        * {
        *   "form": {
        *     "code": 400,
@@ -129,86 +141,86 @@ class RestController extends AbstractFOSRestController
        *   ]
        * }
        */
-			return View::create($form->getErrors(true), Response::HTTP_BAD_REQUEST);
-		}
-	}
+      return View::create($form->getErrors(true), Response::HTTP_BAD_REQUEST);
+    }
+  }
 
-	/**
-	 * Replaces a resource with another, and returns the new one.
-	 *
-	 * @param string  $resource
-	 * @param string  $id
-	 * @param Request $request
-	 * @return View
-	 * @RestAnnotation\Put(path="/{resource}/{id}")
-	 */
-	public function put(
-		string $resource,
-		string $id,
-		Request $request
-	): View {
-		$repository = $this->entityManager->getRepository($resource);
-		$entity = $repository->findOneBy(['id' => $id]);
-		if (!$entity) {
-			throw new ResourceNotFoundException($resource, $id);
-		}
-		$reflectedClass = new \ReflectionClass($entity);
-		$formTypeClass = 'App\Form\\' . $reflectedClass->getShortName() . 'Type';
-		$symfonyFormType = new $formTypeClass();
-		$form = $this->createForm(
-			$symfonyFormType::class,
-			$entity,
-			[ 'method' => 'PUT' ]
-		);
-		// Don't set fields to NULL when they are missing in the submitted data.
-		// https://stackoverflow.com/a/25295370/2332731
-		$form->submit($request->request->all(), false);
-		
-		if ($form->isSubmitted() && $form->isValid()) {
-			$this->entityManager->persist($entity);
-			$this->entityManager->flush();
-			return View::create($entity, Response::HTTP_OK);
-		} else {
-			return View::create($form->getErrors(true), Response::HTTP_BAD_REQUEST);
-		}
-	}
+  /**
+   * Replaces a resource with another, and returns the new one.
+   *
+   * @param string  $resource
+   * @param string  $id
+   * @param Request $request
+   * @return View
+   * @RestAnnotation\Put(path="/{resource}/{id}")
+   */
+  public function put(
+    string $resource,
+    string $id,
+    Request $request
+  ): View {
+    $repository = $this->entityManager->getRepository($resource);
+    $entity = $repository->findOneBy(['id' => $id]);
+    if (!$entity) {
+      throw new ResourceNotFoundException($resource, $id);
+    }
+    $reflectedClass = new \ReflectionClass($entity);
+    $formTypeClass = 'App\Form\\' . $reflectedClass->getShortName() . 'Type';
+    $symfonyFormType = new $formTypeClass();
+    $form = $this->createForm(
+      $symfonyFormType::class,
+      $entity,
+      [ 'method' => 'PUT' ]
+    );
+    // Don't set fields to NULL when they are missing in the submitted data.
+    // https://stackoverflow.com/a/25295370/2332731
+    $form->submit($request->request->all(), false);
+    
+    if ($form->isSubmitted() && $form->isValid()) {
+      $this->entityManager->persist($entity);
+      $this->entityManager->flush();
+      return View::create($entity, Response::HTTP_OK);
+    } else {
+      return View::create($form->getErrors(true), Response::HTTP_BAD_REQUEST);
+    }
+  }
 
-	/**
-	 * Deletes and returns a resource.
-	 *
-	 * @param string $resource
-	 * @param string $id
-	 * @return View
-	 * @RestAnnotation\Delete("/{resource}/{id}")
-	 */
-	public function delete(string $resource, string $id): View {
-		$repository = $this->entityManager->getRepository($resource);
-		$entity = $repository->findOneBy(['id' => $id]);
-		if (!$entity) {
-			throw new ResourceNotFoundException($resource, $id);
-		}
-		$this->entityManager->remove($entity);
-		$this->entityManager->flush();
-		return View::create($entity, Response::HTTP_OK);
-	}
+  /**
+   * Deletes and returns a resource.
+   *
+   * @param string $resource
+   * @param string $id
+   * @return View
+   * @RestAnnotation\Delete("/{resource}/{id}")
+   */
+  public function delete(string $resource, string $id): View {
+    $repository = $this->entityManager->getRepository($resource);
+    $entity = $repository->findOneBy(['id' => $id]);
+    if (!$entity) {
+      throw new ResourceNotFoundException($resource, $id);
+    }
+    $this->entityManager->remove($entity);
+    $this->entityManager->flush();
+    return View::create($entity, Response::HTTP_OK);
+  }
 
-	private function sendNewPlayerEmail(
-		Player $player,
-		NotifierInterface $notifier
-	): Void {
-			// Create a Notification that has to be sent
-			// using the "email" channel
-			$notification =
-				(new Notification('Has sido registrado en LaLiga', ['email']))
-					->content(
-						'Hola ' . $player->getName() . '! ' .
-						'Has sido dado de alta en la base de datos de LaLiga.'
-					);
+  private function sendNewPlayerEmail(
+    Player $player,
+    NotifierInterface $notifier
+  ): Void {
+      // Create a Notification that has to be sent
+      // using the "email" channel
+      $notification =
+        (new Notification('Has sido registrado en LaLiga', ['email']))
+          ->content(
+            'Hola ' . $player->getName() . '! ' .
+            'Has sido dado de alta en la base de datos de LaLiga.'
+          );
 
-			// The receiver of the Notification
-			$recipient = new Recipient($player->getEmail());
+      // The receiver of the Notification
+      $recipient = new Recipient($player->getEmail());
 
-			// Send the notification to the recipient
-			$notifier->send($notification, $recipient);
-	}
+      // Send the notification to the recipient
+      $notifier->send($notification, $recipient);
+  }
 }

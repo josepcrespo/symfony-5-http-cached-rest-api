@@ -27,4 +27,11 @@ services:
     class: 'App\EventListener\ResourceResolvingListener'
     tags:
       - {name: kernel.event_listener, priority: 1}
+        
+  App\Service\FileUploader:
+    arguments:
+      $targetDirectory: '%images_directory%'
+
+parameters:
+  images_directory: '%kernel.project_dir%/public/uploads/images'
 

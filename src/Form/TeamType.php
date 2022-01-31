@@ -6,10 +6,12 @@ use App\Entity\Team;
 use App\Form\PlayerType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class TeamType extends AbstractType
 {
@@ -23,7 +25,26 @@ class TeamType extends AbstractType
     $builder
       ->add('id', IntegerType::class, ['required' => true])
       ->add('name', TextType::class, ['required' => true])
-      ->add('emblem', TextType::class, ['required' => false])
+      ->add('emblem', FileType::class, [
+        // Unmapped means that this field is not associated to any entity property.
+        'mapped' => false,
+        // Make it optional so you don't have to re-upload the file
+        // every time you edit the Product details.
+        'required' => false,
+        // Unmapped fields can't define their validation using annotations
+        // in the associated entity, so you can use the PHP constraint classes.
+        'constraints' => [
+          new File([
+            'maxSize' => '1024k',
+            'mimeTypes' => [
+              'image/gif',
+              'image/jpeg',
+              'image/png'
+            ],
+            'mimeTypesMessage' => 'Please upload a valid Image file (gif, jpeg, png).'
+          ])
+        ]
+      ])
       ->add('salary_limit', IntegerType::class, ['required' => true])
       ->add('players', CollectionType::class, [
               'allow_add' => true,
