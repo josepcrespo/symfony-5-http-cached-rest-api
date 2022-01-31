@@ -11,7 +11,8 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
+
 
 class TeamType extends AbstractType
 {
@@ -34,7 +35,7 @@ class TeamType extends AbstractType
         // Unmapped fields can't define their validation using annotations
         // in the associated entity, so you can use the PHP constraint classes.
         'constraints' => [
-          new File([
+          new Image([
             'maxSize' => '1024k',
             'mimeTypes' => [
               'image/gif',
