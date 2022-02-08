@@ -71,8 +71,9 @@ class PlayerType extends AbstractType
           // We always want to get a real Team object.
           // Detaching the object from the Doctrine Entity Manager, forces
           // to fetch it from the database when using the `find` method.
-          $entityManager->detach($data[$teamPropName]);
-
+          if (is_object($data[$teamPropName])) {
+            $entityManager->detach($data[$teamPropName]);
+          }
           $team = $entityManager->find(Team::class, $teamId);
           if (!$team) {
             throw new ResourceNotFoundException($teamPropName, $teamId);
