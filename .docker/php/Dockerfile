@@ -22,7 +22,12 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN chmod +x /usr/local/bin/install-php-extensions && sync
 
 # Install php extensions and composer into image.
-RUN install-php-extensions pgsql pdo_pgsql opcache @composer xsl
+# Using the `apfd` PHP extension is ESSENTIAL to let PHP's post handler parse
+# `multipart/form-data`, `application/x-www-form-urlencoded` or any other custom
+# registered form data handler, without regard to the request's request method.
+# https://pecl.php.net/package/apfd
+RUN install-php-extensions pgsql pdo_pgsql opcache @composer xsl apfd
+
 
 # Install additional software packages into image.
 RUN apk add --no-cache bash

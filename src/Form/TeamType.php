@@ -13,7 +13,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
 
-
 class TeamType extends AbstractType
 {
   /**
@@ -23,6 +22,9 @@ class TeamType extends AbstractType
   
   public function buildForm(FormBuilderInterface $builder, array $options): void
   {
+    /** @var EntityManagerInterface $entityManager */
+    $entityManager = $options['entity_manager'];
+
     $builder
       ->add('id', IntegerType::class, ['required' => true])
       ->add('name', TextType::class, ['required' => true])
@@ -53,6 +55,8 @@ class TeamType extends AbstractType
            'by_reference' => false,
            'delete_empty' => true,
              'entry_type' => PlayerType::class,
+          'entry_options' => [ 'entity_manager' => $entityManager ],
+         'error_bubbling' => true,
         'invalid_message' => 'Not valid player.',
                'required' => false
       ]);
@@ -60,6 +64,7 @@ class TeamType extends AbstractType
 
   public function configureOptions(OptionsResolver $resolver): void
   {
+    $resolver->setRequired('entity_manager');
     $resolver->setDefaults([
       'data_class' => Team::class,
     ]);
