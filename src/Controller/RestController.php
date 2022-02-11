@@ -76,6 +76,8 @@ class RestController extends AbstractFOSRestController
     if (!$entity) {
       throw new ResourceNotFoundException($resource, $id);
     }
+    $entity = $this->preRenderEvent($entity);
+
     return View::create($entity, Response::HTTP_OK);
   }
 
@@ -129,7 +131,8 @@ class RestController extends AbstractFOSRestController
 
       $this->entityManager->persist($entity);
       $this->entityManager->flush();
-      $entity = $this->postPersistEvents($entity);
+      $entity = $this->preRenderEvent($entity);
+
 
       return View::create($entity, Response::HTTP_OK);
     } else {
@@ -220,7 +223,7 @@ class RestController extends AbstractFOSRestController
       $entity = $this->prePersistEvents($entity, $request);
       $this->entityManager->persist($entity);
       $this->entityManager->flush();
-      $entity = $this->postPersistEvents($entity);
+      $entity = $this->preRenderEvent($entity);
 
       return View::create($entity, Response::HTTP_OK);
     } else {
@@ -258,8 +261,12 @@ class RestController extends AbstractFOSRestController
     return $entity;
   }
 
-  private function postPersistEvents(object $entity): object {
-    if ($entity instanceof Player) {
+  private function preRenderEvent(object $entity): object {
+    $request = Request::createFromGlobals();
+    if (
+      $entity instanceof Player &&
+      $request->getMethod() === 'POST'
+    ) {
       $this->sendNewPlayerEmail($entity);
     }
     if ($entity instanceof Team) {
